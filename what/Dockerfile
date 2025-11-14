@@ -40,12 +40,6 @@ RUN npm i --omit=dev
 COPY index.js ./
 
 ENV NODE_ENV=production
-ENV LOG_LEVEL=info
-ENV AUTH_DIR=/data/auth
-ENV STORE_FILE=/data/store/baileys_store.json
-ENV SAVE_INTERVAL_MS=60000
-
-RUN mkdir -p /data/auth /data/store
 
 EXPOSE 6800
 
