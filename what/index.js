@@ -58,8 +58,20 @@ const client = new Client({
 });
 
 client.on('qr', (qr) => {
-  qrcode.generate(qr, { small: true });
-  console.log('QR-код сгенерирован. Откройте WhatsApp → Связанные устройства → Сканировать QR.');
+  // Выводим QR-код в текстовом виде и как URL
+  console.log('\n========================================');
+  console.log('QR-код для авторизации WhatsApp:');
+  console.log('========================================');
+  console.log('Откройте WhatsApp → Связанные устройства → Сканировать QR');
+  console.log('\nИли откройте эту ссылку в браузере для сканирования:');
+  console.log(`https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(qr)}`);
+  console.log('\nТекстовая версия QR-кода:');
+  try {
+    qrcode.generate(qr, { small: true });
+  } catch (err) {
+    console.log('(Терминал не поддерживает отображение QR-кода)');
+  }
+  console.log('========================================\n');
 });
 
 client.on('ready', async () => {
