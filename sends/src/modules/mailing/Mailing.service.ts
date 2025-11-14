@@ -47,11 +47,54 @@ export class MailingService {
         const fifteenMinutes = 15 * 60 * 1000;
         return Math.floor(Math.random() * (fifteenMinutes - oneMinute)) + oneMinute;
     }
+
+    private getMoscowTime(): Date {
+        const now = new Date();
+        const utc = now.getTime() + (now.getTimezoneOffset() * 60 * 1000);
+        const moscowOffset = 3 * 60 * 60 * 1000; // UTC+3
+        return new Date(utc + moscowOffset);
+    }
+
+    private isWorkingHours(): boolean {
+        const moscowTime = this.getMoscowTime();
+        const hours = moscowTime.getHours();
+        return hours >= 9 && hours < 22;
+    }
+
+    private async waitForWorkingHours(): Promise<void> {
+        while (!this.isWorkingHours()) {
+            const moscowTime = this.getMoscowTime();
+            const hours = moscowTime.getHours();
+            const minutes = moscowTime.getMinutes();
+            const seconds = moscowTime.getSeconds();
+            
+            let waitMs: number;
+            
+            if (hours < 9) {
+                // Ждем до 9:00 сегодня
+                const currentMs = hours * 3600000 + minutes * 60000 + seconds * 1000;
+                const targetMs = 9 * 3600000; // 9:00:00
+                waitMs = targetMs - currentMs;
+            } else {
+                // Ждем до 9:00 следующего дня
+                const currentMs = hours * 3600000 + minutes * 60000 + seconds * 1000;
+                const targetMs = 9 * 3600000; // 9:00:00
+                waitMs = (24 * 3600000) - currentMs + targetMs;
+            }
+            
+            const waitMinutes = Math.ceil(waitMs / 60000);
+            console.log(`Вне рабочего времени (МСК). Ожидание до 9:00 МСК (примерно ${waitMinutes} минут)`);
+            await new Promise(resolve => setTimeout(resolve, waitMs));
+        }
+    }
     async startMailing() { 
+        await this.waitForWorkingHours();
+        
         const messages = await this.proccesorService.sendMessage(this.mainMessage);
 
         for(const number of this.userList) {
-
+            // Проверяем время перед каждой отправкой
+            await this.waitForWorkingHours();
            
             const randomMessage = messages[Math.floor(Math.random() * messages.length)]
             await this.redisService.set(number, JSON.stringify({
@@ -141,6 +184,9 @@ export class MailingService {
     }
 
     private async sendMessage(message: string, number: string, platform: 'telegram' | 'whatsapp') {
+        // Проверяем время перед отправкой ответа
+        await this.waitForWorkingHours();
+        
         await fetch(`${platform === 'telegram' ? this.telegramHost : this.whatsapHost}/send-message`, {
             method: 'POST',
             headers: {
