@@ -20,7 +20,7 @@ services:
     build:
       context: ./sends
       dockerfile: Dockerfile
-    container_name: sends-api
+    container_name: sends-api-v2
     restart: unless-stopped
     ports:
       - "3000:3000"
