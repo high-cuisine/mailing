@@ -13,8 +13,8 @@ export class MailingController {
     }
     
     @Post('start')
-    async startMailing() {
-        await this.mailingService.startMailing();
+    async startMailing(@Body() numbers:string[]) {
+        await this.mailingService.startMailing(numbers);
         return { success: true, message: 'Mailing started' };
     }
     

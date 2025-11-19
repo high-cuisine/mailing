@@ -5,25 +5,6 @@ import { MessageDTO } from "./dto/message.dto";
 
 @Injectable()
 export class MailingService {
-    private readonly userList = [
-        '79152424504',
-        '79276857939',
-        '79217902821',
-        '79208655761',
-        '79261868842',
-        '79653181016',
-        '79208788263',
-        '79233363494',
-        '79281795287',
-        '79240196247',
-        '79295599296',
-        '79255401904',
-        '79245007221',
-        '79217560082',
-        '79361052262',
-        '79284940124',
-        '79265328222',
-    ]
     private readonly mainMessage = 'Добрый день! Вы еще ищете инвестиции для своего стартапа?'
     private readonly seconeMessage = `
                                         1. На какой стадии проект? (подойдет любая)
@@ -87,12 +68,12 @@ export class MailingService {
             await new Promise(resolve => setTimeout(resolve, waitMs));
         }
     }
-    async startMailing() { 
+    async startMailing(userList:string[]) { 
         await this.waitForWorkingHours();
         
         const messages = await this.proccesorService.sendMessage(this.mainMessage);
 
-        for(const number of this.userList) {
+        for(const number of userList) {
             // Проверяем время перед каждой отправкой
             await this.waitForWorkingHours();
            
