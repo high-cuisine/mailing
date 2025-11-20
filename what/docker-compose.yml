@@ -7,6 +7,9 @@ services:
       - 6800:6800
     environment:
       API_HOST: "${API_HOST:-http://host.docker.internal:3000}"
+      LANG: "en_US.UTF-8"
+      LC_ALL: "en_US.UTF-8"
+      LANGUAGE: "en_US:en"
     volumes:
       - ./data:/app/data
     tty: true

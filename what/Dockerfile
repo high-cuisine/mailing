@@ -1,6 +1,7 @@
 FROM node:20-bullseye-slim
 
 # ВАЖНО: ставим git и openssh (некоторые пакеты тянут deps из GitHub)
+# Также устанавливаем локали для корректного отображения UTF-8
 RUN apt-get update && apt-get install -y --no-install-recommends \
   git \
   openssh-client \
@@ -21,6 +22,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
   libxrandr2 \
   xdg-utils \
   tini \
+  locales \
+  && sed -i '/en_US.UTF-8/s/^# //g' /etc/locale.gen \
+  && locale-gen en_US.UTF-8 \
   && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
@@ -34,8 +38,10 @@ COPY package.json ./
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
 
+# Устанавливаем UTF-8 кодировку для корректного отображения кириллицы
 ENV LANG=en_US.UTF-8
 ENV LC_ALL=en_US.UTF-8
+ENV LANGUAGE=en_US:en
 
 RUN npm i --omit=dev
 

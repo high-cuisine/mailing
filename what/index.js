@@ -1,3 +1,7 @@
+// Устанавливаем UTF-8 кодировку для корректного вывода кириллицы
+process.stdout.setDefaultEncoding('utf8');
+process.stderr.setDefaultEncoding('utf8');
+
 const { Client, LocalAuth } = require('whatsapp-web.js');
 const qrcode = require('qrcode-terminal');
 const express = require('express');
